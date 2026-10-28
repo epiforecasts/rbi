@@ -237,6 +237,9 @@ bi_read <- function(x, vars, dims, model, type, file, missval_threshold,
 
         ## find matching time and coord variables
         all_matching_dims <- c()
+        ## columns whose values come from a coord variable rather than
+        ## from melt()ing a dense array, and so are already 0-based
+        coord_value_cols <- character(0)
         for (var_type in c("time", "coord")) {
           matching_dims <- unname(unlist(var_dims[[var_type]])[
             unlist(var_dims[[var_type]]) %in% dim_var_names
@@ -262,6 +265,9 @@ bi_read <- function(x, vars, dims, model, type, file, missval_threshold,
               mav_merge <- data.table(dcast(
                 mav_merge, ... ~ variable, value.var = "coord"
               ))
+              coord_value_cols <- c(
+                coord_value_cols, setdiff(colnames(mav_merge), matching_dims)
+              )
             } else {
               mav_merge <- data.table(melt(
                 merge_values, varnames = c(matching_dims),
@@ -307,8 +313,15 @@ bi_read <- function(x, vars, dims, model, type, file, missval_threshold,
           ## strip trailing numbers, these indicate duplicate dimensions
           dim_col <- sub("\\.[0-9]+$", "", col)
           if (!missing(dims) && !is.null(dims) && dim_col %in% names(dims)) {
+            ## values read from a coordinate variable are already
+            ## 0-based; only dense dimensions obtained via melt() are
+            ## 1-based array indices and need shifting
+            values <- mav[[col]]
+            if (!(col %in% coord_value_cols)) {
+              values <- values - 1L
+            }
             mav[[col]] <- factor(
-              mav[[col]] - 1L,
+              values,
               levels = seq_along(dims[[dim_col]]) - 1L,
               labels = dims[[dim_col]]
             )
