@@ -238,7 +238,7 @@ bi_read <- function(x, vars, dims, model, type, file, missval_threshold,
         ## find matching time and coord variables
         all_matching_dims <- c()
         ## columns whose values come from a coord variable rather than
-        ## from melt()ing a dense array, and so are already 0-based
+        ## from melt()ing a dense array; these are already 0-based
         coord_value_cols <- character(0)
         for (var_type in c("time", "coord")) {
           matching_dims <- unname(unlist(var_dims[[var_type]])[
