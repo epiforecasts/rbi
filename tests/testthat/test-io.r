@@ -149,6 +149,20 @@ test_that("saved and re-loaded objects are the same", {
   expect_true(all(unlist(values1) - unlist(values2) < 1e-5))
 })
 
+test_that("sparse coordinate dimensions keep their written labels", {
+  obs <- list(Incidence = data.frame(
+    zone = factor(c("a", "a", "b", "c", "c"), levels = c("a", "b", "c")),
+    time = c(1, 2, 1, 1, 2),
+    value = 1:5
+  ))
+  filename <- tempfile(fileext = ".nc")
+  out <- bi_write(filename, obs)
+  read_obs <- bi_read(filename, dims = out$dims, coord_dims = out$coord_dims)
+  expect_equal(
+    as.character(read_obs$Incidence$zone), as.character(obs$Incidence$zone)
+  )
+})
+
 test_that("IO works with character strings", {
   test_char <- lapply(test_output, function(df) {
     if ("a" %in% colnames(df)) df$a <- as.character(df$a)
