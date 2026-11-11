@@ -2,6 +2,9 @@
 
 ## rbi (development version)
 
+- [`bi_read()`](https://epiforecasts.io/rbi/reference/bi_read.md) no
+  longer shifts the labels of sparse coordinate dimensions by one.
+
 ## rbi 1.0.1
 
 CRAN release: 2026-02-11
