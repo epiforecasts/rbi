@@ -114,7 +114,7 @@ bi_write(filename, variables)
 #> list()
 #> 
 bi_file_summary(filename)
-#> File /tmp/RtmpRiYkNj/dummy3828678dadf7.nc (NC_FORMAT_CLASSIC):
+#> File /tmp/RtmpJrILAz/dummy3699519ef8db.nc (NC_FORMAT_CLASSIC):
 #> 
 #>      2 variables (excluding dimension variables):
 #>         float a[]   
