@@ -2,12 +2,14 @@
 ## pinned by observations and fanning out once the data run out.
 set.seed(11)
 
-W <- 1200
-H <- 1385
+width <- 1200
+height <- 1385
 
 ## chart panel inside the hexagon
-x0 <- 120; x1 <- 1060
-ytop <- 660; ybot <- 1190
+x0 <- 120
+x1 <- 1060
+ytop <- 660
+ybot <- 1190
 
 n <- 300
 tt <- seq(0, 1, length.out = n)
@@ -65,14 +67,20 @@ hex <- "600,8 1194,350 1194,1035 600,1377 6,1035 6,350"
 for (th in themes) {
   lines_svg <- vapply(seq_len(n_traj), function(i) {
     sprintf(
-      '      <polyline points="%s" fill="none" stroke="%s" stroke-width="3.8" stroke-opacity="0.34"/>',
+      paste0(
+        '      <polyline points="%s" fill="none" stroke="%s"',
+        ' stroke-width="3.8" stroke-opacity="0.34"/>'
+      ),
       pts(tt, traj[, i]), th$traj_col
     )
   }, character(1))
 
   ## posterior mean, running through the middle of the cloud
   mean_svg <- sprintf(
-    '      <polyline points="%s" fill="none" stroke="%s" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>',
+    paste0(
+      '      <polyline points="%s" fill="none" stroke="%s"',
+      ' stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>'
+    ),
     pts(tt[tt <= 0.92], squash(mu)[tt <= 0.92]), th$mean_col
   )
 
@@ -82,31 +90,62 @@ for (th in themes) {
   }, character(1))
 
   svg <- c(
-    sprintf('<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">', W, H, W, H),
-    '  <defs>',
+    sprintf(
+      paste0(
+        '<svg xmlns="http://www.w3.org/2000/svg"',
+        ' width="%d" height="%d" viewBox="0 0 %d %d">'
+      ),
+      width, height, width, height
+    ),
+    "  <defs>",
     '    <clipPath id="hexclip">',
     sprintf('      <polygon points="%s"/>', hex),
-    '    </clipPath>',
-    sprintf('    <linearGradient id="fade" x1="%.0f" y1="0" x2="%.0f" y2="0" gradientUnits="userSpaceOnUse">', sx(0.86), sx(1)),
+    "    </clipPath>",
+    sprintf(
+      paste0(
+        '    <linearGradient id="fade" x1="%.0f" y1="0" x2="%.0f" y2="0"',
+        ' gradientUnits="userSpaceOnUse">'
+      ),
+      sx(0.86), sx(1)
+    ),
     '      <stop offset="0" stop-color="#fff"/>',
     '      <stop offset="1" stop-color="#000"/>',
-    '    </linearGradient>',
+    "    </linearGradient>",
     '    <mask id="fademask">',
-    sprintf('      <rect x="0" y="0" width="%.0f" height="%d" fill="#fff"/>', sx(0.86), H),
-    sprintf('      <rect x="%.0f" y="0" width="%.0f" height="%d" fill="url(#fade)"/>', sx(0.86), sx(1) - sx(0.86), H),
-    '    </mask>',
-    '  </defs>',
+    sprintf(
+      '      <rect x="0" y="0" width="%.0f" height="%d" fill="#fff"/>',
+      sx(0.86), height
+    ),
+    sprintf(
+      paste0(
+        '      <rect x="%.0f" y="0" width="%.0f" height="%d"',
+        ' fill="url(#fade)"/>'
+      ),
+      sx(0.86), sx(1) - sx(0.86), height
+    ),
+    "    </mask>",
+    "  </defs>",
     sprintf('  <polygon points="%s" fill="%s"/>', hex, th$ground),
     '  <g clip-path="url(#hexclip)">',
     '    <g mask="url(#fademask)">',
     lines_svg,
-    '    </g>',
+    "    </g>",
     mean_svg,
     obs_svg,
-    '  </g>',
-    sprintf('  <polygon points="%s" fill="none" stroke="%s" stroke-width="16"/>', hex, th$ink),
-    sprintf('  <text x="600" y="580" text-anchor="middle" font-family="Inter, Fira Sans, sans-serif" font-weight="600" font-size="300" fill="%s" letter-spacing="4">rbi</text>', th$ink),
-    '</svg>'
+    "  </g>",
+    sprintf(
+      '  <polygon points="%s" fill="none" stroke="%s" stroke-width="16"/>',
+      hex, th$ink
+    ),
+    sprintf(
+      paste0(
+        '  <text x="600" y="580" text-anchor="middle"',
+        ' font-family="Inter, Fira Sans, sans-serif" font-weight="600"',
+        ' font-size="300" fill="%s" letter-spacing="4">rbi</text>'
+      ),
+      th$ink
+    ),
+    "</svg>"
   )
 
   writeLines(svg, th$file)
